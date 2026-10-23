@@ -9,7 +9,15 @@ cd /srv/canary
 # As chaves abaixo vêm das variáveis de ambiente e são reaplicadas a cada subida
 # (no CasaOS as variáveis são editadas pela interface); as demais chaves não são tocadas.
 mkdir -p config
-[ -f config/config.lua ] || cp config.lua.dist config/config.lua
+if [ ! -f config/config.lua ]; then
+  cp config.lua.dist config/config.lua
+  # Padrões para single player, só na criação (depois vale o que estiver no arquivo):
+  # sem PvP e sem gangues de bots emboscando o jogador real.
+  sed -i -E \
+    -e 's|^(worldType\s*=\s*)"[a-z-]+"|\1"no-pvp"|' \
+    -e 's|^(botGangTargetPlayers\s*=\s*)true|\1false|' \
+    config/config.lua
+fi
 sed -i -E \
   -e "s|^(mysqlHost\s*=).*|\1 \"${DB_HOST}\"|" \
   -e "s|^(mysqlUser\s*=).*|\1 \"${DB_USER}\"|" \

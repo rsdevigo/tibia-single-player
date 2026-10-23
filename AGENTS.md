@@ -13,6 +13,7 @@ Este repositório **não contém o código do servidor**: só o empacotamento (D
   (22.04 falha: o binário pede GLIBCXX_3.4.32, do GCC 13; a 24.04 atende e tem glibc >= 2.35).
 - `docker/entrypoint.sh` — gera `config.lua` na primeira vez e reaplica a cada subida as chaves vindas do ambiente (`mysql*`, `ip`, `botPlayersOnline`),
   espera o MariaDB, importa `schema.sql` + `database/bots/import.sh` se o banco estiver vazio, e executa `./canary`.
+- Padrões single player aplicados só ao criar o `config.lua`: `worldType = "no-pvp"` e `botGangTargetPlayers = false`.
 - `docker-compose.yml` — serviços `db` (MariaDB 10.11, utf8mb3) e `canary`.
 - `.env.example` — variáveis; copie para `.env`.
 

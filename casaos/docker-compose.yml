@@ -10,8 +10,11 @@
 name: tibia-single-player
 services:
   db:
-    image: mariadb:10.11
+    # Espelho do Docker Hub no Google: o pull direto do Docker Hub falhou no CasaOS (TLS handshake timeout).
+    image: mirror.gcr.io/library/mariadb:10.11
     container_name: tibia-db
+    networks:
+      - tibia
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: troque-root
@@ -19,7 +22,10 @@ services:
       MARIADB_USER: canary
       MARIADB_PASSWORD: troque-isto
       MARIADB_AUTO_UPGRADE: "1"
-    command: --character-set-server=utf8mb3 --collation-server=utf8mb3_general_ci
+    # Em lista: o CasaOS não separa a string por espaços e passaria tudo como um só argumento.
+    command:
+      - --character-set-server=utf8mb3
+      - --collation-server=utf8mb3_general_ci
     volumes:
       - type: bind
         source: /DATA/AppData/tibia-single-player/mysql
@@ -44,6 +50,8 @@ services:
   canary:
     image: ghcr.io/rsdevigo/tibia-single-player:latest
     container_name: tibia-canary
+    networks:
+      - tibia
     restart: unless-stopped
     depends_on:
       db:
@@ -92,6 +100,8 @@ services:
   web:
     image: ghcr.io/rsdevigo/tibia-single-player-web:latest
     container_name: tibia-web
+    networks:
+      - tibia
     restart: unless-stopped
     depends_on:
       - canary
@@ -99,7 +109,7 @@ services:
       MYAAC_INSTALL_IPS: ""
     ports:
       - target: 80
-        published: "8080"
+        published: "8050"
         protocol: tcp
     volumes:
       - type: bind
@@ -123,6 +133,11 @@ services:
           description:
             en_US: config.local.php do MyAAC
 
+# Rede própria: sem ela o CasaOS põe tudo na bridge padrão, onde o nome "db" não resolve.
+networks:
+  tibia:
+    driver: bridge
+
 x-casaos:
   architectures:
     - amd64
@@ -138,8 +153,8 @@ x-casaos:
     en_US: |
       Servidor OpenTibiaBR Canary (fork canary-bots-with-cast) com jogadores-bot, MariaDB e MyAAC.
       Na 1ª vez, abra /install e use servidor /srv/canary e banco db / canary.
-      Cliente: OTClient Redemption com login HTTP em http://IP:8080/login.php.
+      Cliente: OTClient Redemption com login HTTP em http://IP:8050/login.php.
   icon: https://cdn.jsdelivr.net/gh/rsdevigo/tibia-single-player@main/casaos/icon.png
   index: /
-  port_map: "8080"
+  port_map: "8050"
   scheme: http
