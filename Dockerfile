@@ -20,6 +20,9 @@ RUN curl -fL "$REL/canary" -o canary \
  && tr -d '\r' < database/bots/import.sh > /tmp/import.sh && mv /tmp/import.sh database/bots/import.sh \
  && chmod +x canary
 
+# Scripts próprios (ex.: !trade / !temple), carregados junto com os do datapack.
+COPY docker/scripts/trade_area.lua data-otservbr-global/scripts/custom/trade_area.lua
+
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
