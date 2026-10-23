@@ -1,0 +1,59 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: tibia-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootchangeme}
+      MARIADB_DATABASE: ${DB_NAME:-canary}
+      MARIADB_USER: ${DB_USER:-canary}
+      MARIADB_PASSWORD: ${DB_PASS:-canary}
+      MARIADB_AUTO_UPGRADE: "1"
+    command: --character-set-server=utf8mb3 --collation-server=utf8mb3_general_ci
+    volumes:
+      - ${DATA_DIR:-./data}/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      retries: 10
+
+  canary:
+    build:
+      context: .
+      args:
+        CANARY_BOTS_VERSION: ${CANARY_BOTS_VERSION:-v2026.09.01}
+    image: tibia-single-player:latest
+    container_name: tibia-canary
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-canary}
+      DB_USER: ${DB_USER:-canary}
+      DB_PASS: ${DB_PASS:-canary}
+      SERVER_IP: ${SERVER_IP:-127.0.0.1}   # IP do CasaOS na LAN
+      BOT_PLAYERS_ONLINE: ${BOT_PLAYERS_ONLINE:-100}
+    ports:
+      - "7171:7171"   # login
+      - "7172:7172"   # game
+    volumes:
+      - ${DATA_DIR:-./data}/config:/srv/canary/config
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        CANARY_BOTS_VERSION: ${CANARY_BOTS_VERSION:-v2026.09.01}
+    image: tibia-single-player-web:latest
+    container_name: tibia-web
+    restart: unless-stopped
+    depends_on:
+      - canary
+    ports:
+      - "${WEB_PORT:-8080}:80"   # MyAAC + login.php (a 80 costuma estar ocupada pelo CasaOS)
+    volumes:
+      - ${DATA_DIR:-./data}/config:/srv/canary/config:ro
+      - ${DATA_DIR:-./data}/myaac:/persist

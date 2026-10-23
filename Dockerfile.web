@@ -1,0 +1,34 @@
+# MyAAC (site + contas) com o login.php cast-aware do fork canary-bots-with-cast.
+# O cliente faz login via HTTP (login.php), então este serviço é necessário para jogar.
+FROM php:8.2-apache
+
+ARG CANARY_BOTS_VERSION=v2026.09.01
+ARG MYAAC_VERSION=1.9.5
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git curl unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libxml2-dev libonig-dev libcurl4-openssl-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" gd pdo_mysql mysqli zip xml mbstring curl \
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
+
+# MyAAC
+RUN curl -fL "https://github.com/slawkens/myaac/releases/download/v${MYAAC_VERSION}/myaac-${MYAAC_VERSION}.tar.gz" \
+    | tar xz --strip-components=1 -C /var/www/html \
+ && cp /var/www/html/.htaccess.dist /var/www/html/.htaccess \
+ && sed -ri "s!AllowOverride None!AllowOverride All!" /etc/apache2/apache2.conf
+
+# login.php cast-aware + plugins (worldmap) do fork, na mesma versão do servidor
+RUN git clone --depth 1 --branch "${CANARY_BOTS_VERSION}" https://github.com/1LineAtaTime/canary-bots-with-cast.git /tmp/fork \
+ && cp /tmp/fork/deployment/web/login.php /var/www/html/login.php \
+ && cp -r /tmp/fork/deployment/web/plugins/. /var/www/html/plugins/ \
+ && rm -rf /tmp/fork
+
+# O MyAAC lê config.lua e data/ do servidor (caminho informado no instalador: /srv/canary)
+ARG REL=https://github.com/1LineAtaTime/canary-bots-with-cast/releases/download/${CANARY_BOTS_VERSION}
+RUN mkdir -p /srv/canary && curl -fL "$REL/canary-bots-runtime-${CANARY_BOTS_VERSION}.tar.gz" | tar xz -C /srv/canary
+
+COPY docker/web-entrypoint.sh /web-entrypoint.sh
+RUN chmod +x /web-entrypoint.sh && chown -R www-data:www-data /var/www/html
+ENTRYPOINT ["/web-entrypoint.sh"]
+CMD ["apache2-foreground"]

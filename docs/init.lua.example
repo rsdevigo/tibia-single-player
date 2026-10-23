@@ -1,0 +1,21 @@
+-- Trechos do init.lua do OTClient Redemption para este servidor.
+-- Substitua 192.168.0.10 pelo IP do CasaOS (o mesmo de SERVER_IP no .env)
+-- e 8080 pelo WEB_PORT, se tiver mudado.
+-- Só as seções abaixo mudam; mantenha o resto do init.lua original do cliente.
+
+-- updater / services
+Services = {
+    --updater = "http://192.168.0.10:8080/api/updater.php",
+    status = "http://192.168.0.10:8080/login.php",
+    websites = "http://192.168.0.10:8080/?subtopic=accountmanagement",
+    createAccount = "http://192.168.0.10:8080/clientcreateaccount.php",
+    getCoinsUrl = "http://192.168.0.10:8080/?subtopic=shop&step=terms",
+}
+
+Servers_init = {
+    ["http://192.168.0.10:8080/login.php"] = {
+        ["port"] = 8080,
+        ["protocol"] = 1500,
+        ["httpLogin"] = true,
+    }
+}
