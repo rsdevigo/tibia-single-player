@@ -48,4 +48,7 @@ if [ "$(q "SELECT COUNT(*) FROM accounts WHERE id=65000")" = "0" ]; then
   (cd database/bots && DB_HOST="$DB_HOST" DB_USER="$DB_USER" DB_PASS="$DB_PASS" DB_NAME="$DB_NAME" bash import.sh)
 fi
 
+# Tabelas que o fork usa mas não cria (idempotente; roda a cada subida para corrigir bancos antigos).
+mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" < /docker/bot_missing_tables.sql
+
 exec ./canary

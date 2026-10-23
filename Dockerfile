@@ -23,6 +23,7 @@ RUN curl -fL "$REL/canary" -o canary \
 # Scripts próprios (ex.: !trade / !temple), carregados junto com os do datapack.
 COPY docker/scripts/trade_area.lua data-otservbr-global/scripts/custom/trade_area.lua
 
+COPY docker/sql/bot_missing_tables.sql /docker/bot_missing_tables.sql
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
