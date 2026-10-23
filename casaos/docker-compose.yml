@@ -1,0 +1,145 @@
+# Compose para o CasaOS: Apps -> Custom Install -> Import (colar este arquivo).
+# Diferenças para o docker-compose.yml da raiz: usa imagens prontas do GHCR (o CasaOS não faz build),
+# não lê .env (valores literais, editáveis depois na tela de configurações do app) e grava em /DATA/AppData.
+#
+# ANTES DE INSTALAR, troque:
+#   - SERVER_IP: IP do CasaOS na rede local;
+#   - as senhas do banco. A senha do usuário "canary" aparece DUAS vezes
+#     (MARIADB_PASSWORD no "db" e DB_PASS no "canary") e precisa ser igual nas duas.
+#     Depois da 1ª subida o MariaDB ignora MARIADB_*: trocar senha depois exige ALTER USER no banco.
+name: tibia-single-player
+services:
+  db:
+    image: mariadb:10.11
+    container_name: tibia-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: troque-root
+      MARIADB_DATABASE: canary
+      MARIADB_USER: canary
+      MARIADB_PASSWORD: troque-isto
+      MARIADB_AUTO_UPGRADE: "1"
+    command: --character-set-server=utf8mb3 --collation-server=utf8mb3_general_ci
+    volumes:
+      - type: bind
+        source: /DATA/AppData/tibia-single-player/mysql
+        target: /var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      retries: 10
+    x-casaos:
+      envs:
+        - container: MARIADB_ROOT_PASSWORD
+          description:
+            en_US: Senha root do MariaDB (só vale na 1ª instalação)
+        - container: MARIADB_PASSWORD
+          description:
+            en_US: Senha do usuário canary (igual a DB_PASS do serviço canary)
+      volumes:
+        - container: /var/lib/mysql
+          description:
+            en_US: Dados do banco
+
+  canary:
+    image: ghcr.io/rsdevigo/tibia-single-player:latest
+    container_name: tibia-canary
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: canary
+      DB_USER: canary
+      DB_PASS: troque-isto
+      SERVER_IP: 192.168.0.10
+      BOT_PLAYERS_ONLINE: "100"
+    ports:
+      - target: 7171
+        published: "7171"
+        protocol: tcp
+      - target: 7172
+        published: "7172"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /DATA/AppData/tibia-single-player/config
+        target: /srv/canary/config
+    x-casaos:
+      envs:
+        - container: SERVER_IP
+          description:
+            en_US: IP do CasaOS na rede local (vai para o ip do config.lua)
+        - container: DB_PASS
+          description:
+            en_US: Senha do usuário canary (igual a MARIADB_PASSWORD do serviço db)
+        - container: BOT_PLAYERS_ONLINE
+          description:
+            en_US: Bots online (0 a ~997; menos = menos RAM/CPU)
+      ports:
+        - container: "7171"
+          description:
+            en_US: Login
+        - container: "7172"
+          description:
+            en_US: Game
+      volumes:
+        - container: /srv/canary/config
+          description:
+            en_US: config.lua do servidor
+
+  web:
+    image: ghcr.io/rsdevigo/tibia-single-player-web:latest
+    container_name: tibia-web
+    restart: unless-stopped
+    depends_on:
+      - canary
+    environment:
+      MYAAC_INSTALL_IPS: ""
+    ports:
+      - target: 80
+        published: "8080"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /DATA/AppData/tibia-single-player/config
+        target: /srv/canary/config
+        read_only: true
+      - type: bind
+        source: /DATA/AppData/tibia-single-player/myaac
+        target: /persist
+    x-casaos:
+      envs:
+        - container: MYAAC_INSTALL_IPS
+          description:
+            en_US: IPs liberados no /install do MyAAC, separados por espaço (ver logs do web)
+      ports:
+        - container: "80"
+          description:
+            en_US: MyAAC + login.php do cliente
+      volumes:
+        - container: /persist
+          description:
+            en_US: config.local.php do MyAAC
+
+x-casaos:
+  architectures:
+    - amd64
+  main: web
+  author: rsdevigo
+  developer: 1LineAtaTime / OpenTibiaBR
+  category: Games
+  title:
+    en_US: Tibia Single Player
+  tagline:
+    en_US: Servidor Canary local com jogadores-bot e cast
+  description:
+    en_US: |
+      Servidor OpenTibiaBR Canary (fork canary-bots-with-cast) com jogadores-bot, MariaDB e MyAAC.
+      Na 1ª vez, abra /install e use servidor /srv/canary e banco db / canary.
+      Cliente: OTClient Redemption com login HTTP em http://IP:8080/login.php.
+  icon: https://cdn.jsdelivr.net/gh/rsdevigo/tibia-single-player@main/casaos/icon.png
+  index: /
+  port_map: "8080"
+  scheme: http

@@ -4,6 +4,13 @@ set -e
 until [ -f /srv/canary/config/config.lua ]; do echo "Aguardando config.lua..."; sleep 2; done
 ln -sf /srv/canary/config/config.lua /srv/canary/config.lua
 
+# O instalador do MyAAC só aceita IPs exatos listados em install/ip.txt (sem faixas).
+# No Docker o cliente nunca chega como 127.0.0.1, então a lista vem de MYAAC_INSTALL_IPS.
+if [ -d /var/www/html/install ]; then
+  printf '127.0.0.1\n::1\n' > /var/www/html/install/ip.txt
+  for ip in ${MYAAC_INSTALL_IPS:-}; do echo "$ip" >> /var/www/html/install/ip.txt; done
+fi
+
 # Persistência do config.local.php (gerado pelo instalador do MyAAC): cópia de backup em /persist,
 # restaurada na subida. Sem symlink: o Apache precisa poder reescrever o arquivo.
 mkdir -p /persist

@@ -6,18 +6,18 @@ cd /srv/canary
 : "${SERVER_IP:=127.0.0.1}" "${BOT_PLAYERS_ONLINE:=100}"
 
 # config.lua fica em volume (/srv/canary/config) para persistir edições manuais.
+# As chaves abaixo vêm das variáveis de ambiente e são reaplicadas a cada subida
+# (no CasaOS as variáveis são editadas pela interface); as demais chaves não são tocadas.
 mkdir -p config
-if [ ! -f config/config.lua ]; then
-  cp config.lua.dist config/config.lua
-  sed -i -E \
-    -e "s|^(mysqlHost\s*=).*|\1 \"${DB_HOST}\"|" \
-    -e "s|^(mysqlUser\s*=).*|\1 \"${DB_USER}\"|" \
-    -e "s|^(mysqlPass\s*=).*|\1 \"${DB_PASS}\"|" \
-    -e "s|^(mysqlDatabase\s*=).*|\1 \"${DB_NAME}\"|" \
-    -e "s|^(ip\s*=).*|\1 \"${SERVER_IP}\"|" \
-    -e "s|^(botPlayersOnline\s*=).*|\1 ${BOT_PLAYERS_ONLINE}|" \
-    config/config.lua
-fi
+[ -f config/config.lua ] || cp config.lua.dist config/config.lua
+sed -i -E \
+  -e "s|^(mysqlHost\s*=).*|\1 \"${DB_HOST}\"|" \
+  -e "s|^(mysqlUser\s*=).*|\1 \"${DB_USER}\"|" \
+  -e "s|^(mysqlPass\s*=).*|\1 \"${DB_PASS}\"|" \
+  -e "s|^(mysqlDatabase\s*=).*|\1 \"${DB_NAME}\"|" \
+  -e "s|^(ip\s*=).*|\1 \"${SERVER_IP}\"|" \
+  -e "s|^(botPlayersOnline\s*=).*|\1 ${BOT_PLAYERS_ONLINE}|" \
+  config/config.lua
 ln -sf config/config.lua config.lua
 
 echo "Aguardando o banco..."

@@ -52,6 +52,8 @@ services:
     restart: unless-stopped
     depends_on:
       - canary
+    environment:
+      MYAAC_INSTALL_IPS: ${MYAAC_INSTALL_IPS:-}   # IPs liberados no /install (separados por espaço)
     ports:
       - "${WEB_PORT:-8080}:80"   # MyAAC + login.php (a 80 costuma estar ocupada pelo CasaOS)
     volumes:
