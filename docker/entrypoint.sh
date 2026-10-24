@@ -4,6 +4,8 @@ cd /srv/canary
 
 : "${DB_HOST:=db}" "${DB_USER:=canary}" "${DB_PASS:=canary}" "${DB_NAME:=canary}"
 : "${SERVER_IP:=127.0.0.1}" "${BOT_PLAYERS_ONLINE:=100}"
+# Versão do cliente gravada no MyAAC; acompanha o protocolo do servidor (Canary v3.6.1 = 15.11).
+: "${MYAAC_CLIENT_VERSION:=1511}"
 
 # config.lua fica em volume (/srv/canary/config) para persistir edições manuais.
 # As chaves abaixo vêm das variáveis de ambiente e são reaplicadas a cada subida
@@ -48,7 +50,27 @@ if [ "$(q "SELECT COUNT(*) FROM accounts WHERE id=65000")" = "0" ]; then
   (cd database/bots && DB_HOST="$DB_HOST" DB_USER="$DB_USER" DB_PASS="$DB_PASS" DB_NAME="$DB_NAME" bash import.sh)
 fi
 
-# Tabelas que o fork usa mas não cria (idempotente; roda a cada subida para corrigir bancos antigos).
-mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" < /docker/bot_missing_tables.sql
+# Tabelas de runtime dos bots (só CREATE TABLE IF NOT EXISTS): a cada subida, para bancos antigos
+# receberem tabelas novas do canary-bots.
+mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" < database/bots/00_bot_schema.sql
+
+# Bancos criados com o canary-bots-with-cast (v2026.09.01) ficaram em db_version 62 pela migração
+# 62.lua do fork, que saiu da numeração do Canary. Volta uma vez para 56 para o Canary aplicar as
+# migrações 57/58 do v3.6.1 (ambas checam se já foram aplicadas). Não roda de novo: depois disso a
+# versão fica em 58 ou mais.
+if [ "$(q "SELECT value FROM server_config WHERE config='db_version'")" = "62" ] \
+   && [ ! -f data-otservbr-global/migrations/62.lua ]; then
+  echo "db_version 62 (migração antiga do fork): voltando para 56 para aplicar as migrações do Canary."
+  q "UPDATE server_config SET value='56' WHERE config='db_version'"
+fi
+
+# MyAAC: versão do cliente (usada no login.php e nas páginas). Só existe depois do instalador.
+if [ -n "$(q "SHOW TABLES LIKE 'myaac_settings'")" ]; then
+  if [ -n "$(q "SELECT id FROM myaac_settings WHERE name='core' AND \`key\`='client'")" ]; then
+    q "UPDATE myaac_settings SET value='${MYAAC_CLIENT_VERSION}' WHERE name='core' AND \`key\`='client'"
+  else
+    q "INSERT INTO myaac_settings (name, \`key\`, value) VALUES ('core', 'client', '${MYAAC_CLIENT_VERSION}')"
+  fi
+fi
 
 exec ./canary

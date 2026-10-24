@@ -143,15 +143,15 @@ x-casaos:
     - amd64
   main: web
   author: rsdevigo
-  developer: 1LineAtaTime / OpenTibiaBR
+  developer: rsdevigo / 1LineAtaTime / OpenTibiaBR
   category: Games
   title:
     en_US: Tibia Single Player
   tagline:
-    en_US: Servidor Canary local com jogadores-bot e cast
+    en_US: Servidor Canary local (cliente 15.11) com jogadores-bot
   description:
     en_US: |
-      Servidor OpenTibiaBR Canary (fork canary-bots-with-cast) com jogadores-bot, MariaDB e MyAAC.
+      Servidor OpenTibiaBR Canary v3.6.1 (fork rsdevigo/canary-bots) com jogadores-bot, MariaDB e MyAAC.
       Na 1ª vez, abra /install e use servidor /srv/canary e banco db / canary.
       Cliente: OTClient Redemption com login HTTP em http://IP:8050/login.php.
   icon: https://cdn.jsdelivr.net/gh/rsdevigo/tibia-single-player@main/casaos/icon.png

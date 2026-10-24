@@ -1,6 +1,6 @@
 # Client setup — OTClient Redemption
 
-Players (and cast spectators) connect with an OpenTibia client. We use
+Players (and livestream spectators) connect with an OpenTibia client. We use
 **OTClient Redemption**.
 
 ## 1. Download
@@ -31,7 +31,7 @@ Where to obtain / how to extract them:
 ## 3. Point the client at your server
 
 Edit the client's `init.lua` so it logs in through the web login service (this is
-also what enables the `@cast` spectator flow). For a **local** install use
+also what enables the `@livestream` spectator flow). For a **local** install use
 `127.0.0.1`; for a remote server use its address.
 
 ```lua
@@ -47,19 +47,21 @@ Services = {
 Servers_init = {
     ["http://127.0.0.1/login.php"] = {
         ["port"] = 80,
-        ["protocol"] = 1500,
+        ["protocol"] = 1511,
         ["httpLogin"] = true,
     }
 }
 ```
 
-`login.php` is the cast-aware MyAAC login service shipped at
-`deployment/web/login.php` (it intercepts the `@cast` account and returns the
-list of broadcasting characters, including bots). Make sure your web server is
+`login.php` is the livestream-aware MyAAC login service shipped at
+`deployment/web/login.php` (it intercepts the `@livestream` account and returns
+the list of broadcasting characters). Make sure your web server is
 serving it at the address above.
 
-## 4. Spectate (cast)
+## 4. Spectate (livestream)
 
-To watch a live character, log in with the account name **`@cast`** (no
-password) and pick a character from the list. Bots appear there and wake on
-click. A normal player starts broadcasting their own character with `/cast on`.
+This fork uses Canary's built-in livestream instead of the original cast system.
+A player starts broadcasting with `!livestream` (see the talkaction for options
+such as a stream password). To watch, log in with the account name
+**`@livestream`** and the stream password (empty if none) and pick a character.
+Bots cannot be spectated: the livestream mirrors a real client connection.

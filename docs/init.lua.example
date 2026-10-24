@@ -15,7 +15,7 @@ Services = {
 Servers_init = {
     ["http://192.168.0.10:8080/login.php"] = {
         ["port"] = 8080,
-        ["protocol"] = 1500,
+        ["protocol"] = 1511,
         ["httpLogin"] = true,
     }
 }

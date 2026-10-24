@@ -1,0 +1,7 @@
+# Arquivos que vão para as imagens Linux: sempre LF, mesmo com core.autocrlf=true no Windows
+# (um entrypoint com CRLF falha com "exec /entrypoint.sh: no such file or directory").
+*.sh text eol=lf
+*.lua text eol=lf
+*.sql text eol=lf
+*.php text eol=lf
+Dockerfile* text eol=lf
