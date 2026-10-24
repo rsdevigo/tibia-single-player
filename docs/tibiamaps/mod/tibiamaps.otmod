@@ -1,0 +1,10 @@
+Module
+  name: game_tibiamaps
+  description: Carrega o mapa completo do tibiamaps no minimapa a cada entrada no jogo
+  author: rsdevigo
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1001
+  scripts: [ tibiamaps ]
+  @onLoad: init()
+  @onUnload: terminate()
