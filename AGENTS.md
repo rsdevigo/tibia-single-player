@@ -69,7 +69,7 @@ O Custom Install do CasaOS não faz `build:` nem lê `.env`, por isso há um com
   `rsdevigo/canary-bots` na tag `CANARY_BOTS_VERSION`. O `login.php` trata a conta `@livestream` (nenhuma versão do
   MyAAC faz isso: o livestream do Canary só responde no login antigo pela porta 7171).
 - O cliente OTClient faz login por HTTP (`login.php`, protocolo 1511, `httpLogin = true`), então o `web` é **necessário**, não opcional.
-- `core.client` do MyAAC (versão do cliente) é gravado pelo entrypoint do `canary` a cada subida (`MYAAC_CLIENT_VERSION`, padrão 1511).
+- O entrypoint do `canary` grava a cada subida no MyAAC: `core.client` (`MYAAC_CLIENT_VERSION`, padrão 1511) e `core.status_ip` (`MYAAC_STATUS_IP`, padrão `canary`: o instalador grava 127.0.0.1, que dentro do container `web` é ele mesmo, e o painel mostrava o servidor offline).
 - Porta: `WEB_PORT` (padrão 8080 → 80 do container). No `init.lua` do cliente use `http://SERVER_IP:8080/login.php`, porta 8080 (ver `docs/init.lua.example`).
 - Primeiro acesso: abrir `http://SERVER_IP:8080/install`, informar servidor `/srv/canary`, banco `db` / `canary` / usuário e senha do `.env`.
 - Instalador do MyAAC só aceita IPs exatos de `install/ip.txt`; o `web-entrypoint.sh` o regera a cada subida com localhost + `MYAAC_INSTALL_IPS`. Descobrir o IP visto pelo Apache em `docker compose logs web` (1ª coluna do access log).

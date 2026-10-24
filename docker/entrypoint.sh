@@ -6,6 +6,8 @@ cd /srv/canary
 : "${SERVER_IP:=127.0.0.1}" "${BOT_PLAYERS_ONLINE:=100}"
 # Versão do cliente gravada no MyAAC; acompanha o protocolo do servidor (Canary v3.6.1 = 15.11).
 : "${MYAAC_CLIENT_VERSION:=1511}"
+# Endereço que o MyAAC usa para consultar o status: o nome do serviço do servidor no compose.
+: "${MYAAC_STATUS_IP:=canary}"
 
 # config.lua fica em volume (/srv/canary/config) para persistir edições manuais.
 # As chaves abaixo vêm das variáveis de ambiente e são reaplicadas a cada subida
@@ -64,13 +66,20 @@ if [ "$(q "SELECT value FROM server_config WHERE config='db_version'")" = "62" ]
   q "UPDATE server_config SET value='56' WHERE config='db_version'"
 fi
 
-# MyAAC: versão do cliente (usada no login.php e nas páginas). Só existe depois do instalador.
-if [ -n "$(q "SHOW TABLES LIKE 'myaac_settings'")" ]; then
-  if [ -n "$(q "SELECT id FROM myaac_settings WHERE name='core' AND \`key\`='client'")" ]; then
-    q "UPDATE myaac_settings SET value='${MYAAC_CLIENT_VERSION}' WHERE name='core' AND \`key\`='client'"
+# Configurações do MyAAC que dependem deste empacotamento (a tabela só existe depois do instalador):
+# - client: versão do cliente (usada no login.php e nas páginas);
+# - status_ip: de onde o site consulta o status. O instalador grava 127.0.0.1, que dentro do
+#   container web é ele mesmo; o servidor é alcançado pelo nome do serviço na rede do compose.
+set_myaac() {
+  if [ -n "$(q "SELECT id FROM myaac_settings WHERE name='core' AND \`key\`='$1'")" ]; then
+    q "UPDATE myaac_settings SET value='$2' WHERE name='core' AND \`key\`='$1'"
   else
-    q "INSERT INTO myaac_settings (name, \`key\`, value) VALUES ('core', 'client', '${MYAAC_CLIENT_VERSION}')"
+    q "INSERT INTO myaac_settings (name, \`key\`, value) VALUES ('core', '$1', '$2')"
   fi
+}
+if [ -n "$(q "SHOW TABLES LIKE 'myaac_settings'")" ]; then
+  set_myaac client "${MYAAC_CLIENT_VERSION}"
+  set_myaac status_ip "${MYAAC_STATUS_IP}"
 fi
 
 exec ./canary
