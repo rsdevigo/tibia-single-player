@@ -19,9 +19,11 @@ publica `canary`, `libbot_engine.so` e `canary-bots-runtime-<tag>.tar.gz`, que o
   (`mysql*`, `ip`, `botPlayersOnline`), espera o MariaDB, importa `schema.sql` + `database/bots/import.sh` se o banco
   estiver vazio, aplica `database/bots/00_bot_schema.sql` a cada subida (só `CREATE TABLE IF NOT EXISTS`), corrige
   uma vez o `db_version` de bancos antigos (62 → 56, ver abaixo), grava `core.client` no MyAAC e executa `./canary`.
-- Padrões single player aplicados só ao criar o `config.lua`: `worldType = "no-pvp"`, `botGangTargetPlayers = false`
-  e `toggleFreeQuest = true` (free quests só valem para jogadores reais: bots entram por `internalPlaceCreature` e não
-  disparam `onLogin`).
+- Padrões single player aplicados só ao criar o `config.lua` (depois vale o arquivo): `worldType = "no-pvp"`,
+  `botGangTargetPlayers = false`, `toggleFreeQuest = true` (free quests só valem para jogadores reais: bots entram por
+  `internalPlaceCreature` e não disparam `onLogin`), `freePremium = true`, `toggleTravelsFree = true`,
+  `livestreamCasterMinLevel = 0`, `rateBossHealth = 0.7` e mercado dos bots a cada 300–900 s
+  (`botMarketAcceptInterval*`). `playerLoseItemsOnDeath = false` já é o padrão do fork.
 - `docker/scripts/trade_area.lua` (copiado para `data-otservbr-global/scripts/custom/`): `!trade` leva à área de NPCs
   de troca do mapa custom (~995,1030,6, sem acesso pelo mapa principal) e `!temple` volta ao templo.
 - `docker-compose.yml` — serviços `db` (MariaDB 10.11, utf8mb3), `canary` e `web`.

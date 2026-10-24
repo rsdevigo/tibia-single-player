@@ -16,12 +16,22 @@ mkdir -p config
 if [ ! -f config/config.lua ]; then
   cp config.lua.dist config/config.lua
   # Padrões para single player, só na criação (depois vale o que estiver no arquivo):
-  # sem PvP, sem gangues de bots emboscando o jogador real e com quests de acesso liberadas
-  # (free quests só valem para jogadores reais: bots não passam pelo onLogin).
+  # - sem PvP e sem gangues de bots emboscando o jogador real;
+  # - quests de acesso liberadas (só para jogadores reais: bots não passam pelo onLogin);
+  # - premium grátis (não há quem pague) e viagens de barco/tapete sem custo;
+  # - livestream em qualquer level (o padrão exige 200 para ser assistido);
+  # - bosses com 70% da vida (pensados para times; aqui é você + bots);
+  # - bots aceitam as ofertas do jogador no mercado a cada 5-15 min (padrão 15-45).
   sed -i -E \
     -e 's|^(worldType\s*=\s*)"[a-z-]+"|\1"no-pvp"|' \
     -e 's|^(botGangTargetPlayers\s*=\s*)true.*|\1false|' \
     -e 's|^(toggleFreeQuest\s*=\s*)false|\1true|' \
+    -e 's|^(freePremium\s*=\s*)false|\1true|' \
+    -e 's|^(toggleTravelsFree\s*=\s*)false|\1true|' \
+    -e 's|^(livestreamCasterMinLevel\s*=\s*)[0-9]+|\10|' \
+    -e 's|^(rateBossHealth\s*=\s*)[0-9.]+|\10.7|' \
+    -e 's|^(botMarketAcceptIntervalMinSec\s*=\s*)[0-9]+|\1300|' \
+    -e 's|^(botMarketAcceptIntervalMaxSec\s*=\s*)[0-9]+|\1900|' \
     config/config.lua
 fi
 sed -i -E \
