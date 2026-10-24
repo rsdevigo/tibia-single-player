@@ -61,4 +61,5 @@ O Custom Install do CasaOS não faz `build:` nem lê `.env`, por isso há um com
 - Instalador do MyAAC só aceita IPs exatos de `install/ip.txt`; o `web-entrypoint.sh` o regera a cada subida com localhost + `MYAAC_INSTALL_IPS`. Descobrir o IP visto pelo Apache em `docker compose logs web` (1ª coluna do access log).
 - `config.local.php` é copiado (não movido, nem symlink: o Apache precisa reescrevê-lo durante o instalador) para `${DATA_DIR}/myaac` por um loop no `docker/web-entrypoint.sh`. Uploads/imagens do MyAAC não persistem.
 - Assets `Tibia.dat/.spr` (CipSoft) não são distribuídos: ver `deployment/client/README.md` no fork.
+- `Dockerfile.web` corrige o `load_config_lua` do MyAAC 1.9.5: chave `false` com comentário na mesma linha (`x = false -- ...`) dava erro 500 em todo o site e no `login.php`.
 - Tudo do serviço `web` está não testado (extensões PHP, instalação, symlink de config.lua).

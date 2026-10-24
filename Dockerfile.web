@@ -18,6 +18,12 @@ RUN curl -fL "https://github.com/slawkens/myaac/releases/download/v${MYAAC_VERSI
  && cp /var/www/html/.htaccess.dist /var/www/html/.htaccess \
  && sed -ri "s!AllowOverride None!AllowOverride All!" /etc/apache2/apache2.conf
 
+# Bug do load_config_lua (MyAAC 1.9.5): ao tirar um comentário no fim da linha ("x = false  -- ...")
+# sobram espaços, o valor deixa de casar com 'false' e a página dá 500. Corrige com trim().
+# O grep falha o build se o trecho mudar numa versão nova do MyAAC.
+RUN sed -i "s|if(is_numeric(\$value))|\$value = trim(\$value); if(is_numeric(\$value))|" /var/www/html/system/functions.php \
+ && grep -q 'trim($value); if(is_numeric' /var/www/html/system/functions.php
+
 # login.php cast-aware + plugins (worldmap) do fork, na mesma versão do servidor
 RUN git clone --depth 1 --branch "${CANARY_BOTS_VERSION}" https://github.com/1LineAtaTime/canary-bots-with-cast.git /tmp/fork \
  && cp /tmp/fork/deployment/web/login.php /var/www/html/login.php \

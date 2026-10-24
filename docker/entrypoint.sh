@@ -16,7 +16,7 @@ if [ ! -f config/config.lua ]; then
   # (free quests só valem para jogadores reais: bots não passam pelo onLogin).
   sed -i -E \
     -e 's|^(worldType\s*=\s*)"[a-z-]+"|\1"no-pvp"|' \
-    -e 's|^(botGangTargetPlayers\s*=\s*)true|\1false|' \
+    -e 's|^(botGangTargetPlayers\s*=\s*)true.*|\1false|' \
     -e 's|^(toggleFreeQuest\s*=\s*)false|\1true|' \
     config/config.lua
 fi
