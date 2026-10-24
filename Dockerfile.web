@@ -3,7 +3,7 @@
 FROM php:8.2-apache
 
 ARG CANARY_BOTS_REPO=rsdevigo/canary-bots
-ARG CANARY_BOTS_VERSION=v2026.10.24.1
+ARG CANARY_BOTS_VERSION=v2026.10.24.2
 ARG MYAAC_VERSION=1.9.5
 
 RUN apt-get update && apt-get install -y --no-install-recommends \

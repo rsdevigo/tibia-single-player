@@ -21,7 +21,7 @@ services:
     build:
       context: .
       args:
-        CANARY_BOTS_VERSION: ${CANARY_BOTS_VERSION:-v2026.10.24.1}
+        CANARY_BOTS_VERSION: ${CANARY_BOTS_VERSION:-v2026.10.24.2}
     image: tibia-single-player:latest
     container_name: tibia-canary
     restart: unless-stopped
@@ -46,7 +46,7 @@ services:
       context: .
       dockerfile: Dockerfile.web
       args:
-        CANARY_BOTS_VERSION: ${CANARY_BOTS_VERSION:-v2026.10.24.1}
+        CANARY_BOTS_VERSION: ${CANARY_BOTS_VERSION:-v2026.10.24.2}
     image: tibia-single-player-web:latest
     container_name: tibia-web
     restart: unless-stopped

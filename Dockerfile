@@ -4,7 +4,7 @@
 FROM ubuntu:24.04
 
 ARG CANARY_BOTS_REPO=rsdevigo/canary-bots
-ARG CANARY_BOTS_VERSION=v2026.10.24.1
+ARG CANARY_BOTS_VERSION=v2026.10.24.2
 # O mapa principal não vem no tarball de runtime. É o mesmo arquivo desde a v3.4.1 (o release do
 # Canary copia o mapa do release anterior); mudam só house/monster/npc.xml, que vêm no tarball.
 ARG MAP_URL=https://github.com/opentibiabr/canary/releases/download/v3.6.1/otservbr.otbm

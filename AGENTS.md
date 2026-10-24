@@ -20,7 +20,7 @@ publica `canary`, `libbot_engine.so` e `canary-bots-runtime-<tag>.tar.gz`, que o
   estiver vazio, aplica `database/bots/00_bot_schema.sql` a cada subida (só `CREATE TABLE IF NOT EXISTS`), corrige
   uma vez o `db_version` de bancos antigos (62 → 56, ver abaixo), grava `core.client` no MyAAC e executa `./canary`.
 - Padrões single player aplicados só ao criar o `config.lua` (depois vale o arquivo): `worldType = "no-pvp"`,
-  `botGangTargetPlayers = false`, `toggleFreeQuest = true` (free quests só valem para jogadores reais: bots entram por
+  `botGangEnable = false`, `botGangTargetPlayers = false`, `toggleFreeQuest = true` (free quests só valem para jogadores reais: bots entram por
   `internalPlaceCreature` e não disparam `onLogin`), `freePremium = true`, `toggleTravelsFree = true`,
   `livestreamCasterMinLevel = 0`, `rateBossHealth = 0.7` e mercado dos bots a cada 300–900 s
   (`botMarketAcceptInterval*`). `playerLoseItemsOnDeath = false` já é o padrão do fork.
@@ -38,6 +38,8 @@ publica `canary`, `libbot_engine.so` e `canary-bots-runtime-<tag>.tar.gz`, que o
 - `config.lua` vem de `config.lua.dist`; chaves `mysql*`, `ip`, `botPlayersOnline` (padrão 500). Chaves `bot*`
   novas/renomeadas exigem rebuild do fork; valores mudam com `/cavebot _global reloadconfig`.
 - Conta admin padrão `@god` (senha padrão publicada no README/release upstream — **trocar após o 1º login**).
+- Em mundo `no-pvp` os bots não escolhem jogadores reais como alvo (gangue, PK aleatório e re-engage; desde a v2026.10.24.2).
+  O PK aleatório (`checkRandomPK`) não tem chave no `config.lua`.
 - Livestream (do Canary): o jogador transmite com `!livestream on` (senha opcional com `!livestream password, ...`);
   o espectador loga com a conta `@livestream` e a senha da transmissão. Bots não podem ser assistidos.
 - Cliente: OTClient Redemption, **protocolo 1511**; ver `docs/client-README.md` (cópia do README do fork).

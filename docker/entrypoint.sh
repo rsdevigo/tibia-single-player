@@ -16,7 +16,7 @@ mkdir -p config
 if [ ! -f config/config.lua ]; then
   cp config.lua.dist config/config.lua
   # Padrões para single player, só na criação (depois vale o que estiver no arquivo):
-  # - sem PvP e sem gangues de bots emboscando o jogador real;
+  # - sem PvP e sem gangues de bots (nem contra o jogador real, nem entre bots);
   # - quests de acesso liberadas (só para jogadores reais: bots não passam pelo onLogin);
   # - premium grátis (não há quem pague) e viagens de barco/tapete sem custo;
   # - livestream em qualquer level (o padrão exige 200 para ser assistido);
@@ -24,6 +24,7 @@ if [ ! -f config/config.lua ]; then
   # - bots aceitam as ofertas do jogador no mercado a cada 5-15 min (padrão 15-45).
   sed -i -E \
     -e 's|^(worldType\s*=\s*)"[a-z-]+"|\1"no-pvp"|' \
+    -e 's|^(botGangEnable\s*=\s*)true.*|\1false|' \
     -e 's|^(botGangTargetPlayers\s*=\s*)true.*|\1false|' \
     -e 's|^(toggleFreeQuest\s*=\s*)false|\1true|' \
     -e 's|^(freePremium\s*=\s*)false|\1true|' \
