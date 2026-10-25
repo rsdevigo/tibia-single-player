@@ -25,6 +25,10 @@ if not g_resources.fileExists(DIR .. 'markers.json') then
 	return
 end
 
+-- Ícones ignorados: setas de escada/buraco são 62% dos ~6.400 marcadores e, com todos importados, o Cyclopedia
+-- (mapa) do OTClient crashava ao abrir. Para importar tudo, esvazie a tabela.
+local SKIP = { ['up'] = true, ['down'] = true, ['red up'] = true, ['red down'] = true, ['red left'] = true, ['red right'] = true }
+
 -- Mantém os seus marcadores e acrescenta os do tibiamaps que não estiverem na mesma posição.
 local settings = g_settings.getNode('Minimap') or {}
 settings.flags = settings.flags or {}
@@ -37,7 +41,7 @@ local added = 0
 for _, marker in ipairs(json.decode(g_resources.readFileContents(DIR .. 'markers.json'))) do
 	local key = string.format('%d,%d,%d', marker.x, marker.y, marker.z)
 	local icon = ICONS[marker.icon]
-	if icon and not taken[key] then
+	if icon and not SKIP[marker.icon] and not taken[key] then
 		table.insert(settings.flags, {
 			position = { x = marker.x, y = marker.y, z = marker.z },
 			icon = icon,

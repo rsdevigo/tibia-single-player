@@ -1,0 +1,10 @@
+Module
+  name: game_gbashader
+  description: Shader de mapa "HD": suaviza bordas dos sprites (Ctrl+Shift+G liga/desliga)
+  author: rsdevigo
+  sandboxed: true
+  autoload: true
+  autoload-priority: 1001
+  scripts: [ gbashader ]
+  @onLoad: init()
+  @onUnload: terminate()

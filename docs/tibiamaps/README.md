@@ -38,6 +38,8 @@ Invoke-WebRequest "$repo/mod/tibiamaps.lua" -OutFile (Join-Path $mod "tibiamaps.
    ```lua
    dofile('/tibiamaps/import.lua')
    ```
+   O script **pula as setas de escada/buraco** (`up`, `down`, `red *`: 62% do total, ~2.440 marcadores ficam).
+   Com os ~6.400 completos o mapa do Cyclopedia crashava o cliente ao abrir.
 3. Deve aparecer `tibiamaps: N marcadores adicionados`. Rodar de novo não duplica.
 
 ## 3. Mapa (automático)
