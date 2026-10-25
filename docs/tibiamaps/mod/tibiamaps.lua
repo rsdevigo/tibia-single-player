@@ -21,7 +21,33 @@ local function loadFloors()
 	g_logger.info(string.format('tibiamaps: %d andares carregados no minimapa', floors))
 end
 
+-- O mapa do Cyclopedia (Cyclopedia.loadMap) faz g_minimap.clean() e recarrega só o minimap.otmm, apagando as
+-- imagens importadas. Envolvemos a função para recarregá-las logo depois.
+local cyclopediaLoadMap = nil
+
+local function hookCyclopedia()
+	local cyclopedia = modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia
+	if cyclopediaLoadMap or not cyclopedia or not cyclopedia.loadMap then
+		return
+	end
+	cyclopediaLoadMap = cyclopedia.loadMap
+	cyclopedia.loadMap = function(...)
+		local result = cyclopediaLoadMap(...)
+		loadFloors()
+		return result
+	end
+end
+
+local function unhookCyclopedia()
+	local cyclopedia = modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia
+	if cyclopediaLoadMap and cyclopedia then
+		cyclopedia.loadMap = cyclopediaLoadMap
+	end
+	cyclopediaLoadMap = nil
+end
+
 function onGameStart()
+	hookCyclopedia()
 	-- Espera o game_minimap, que no próprio onGameStart limpa o minimapa e carrega o minimap.otmm.
 	scheduleEvent(loadFloors, 1000)
 end
@@ -35,4 +61,5 @@ end
 
 function terminate()
 	disconnect(g_game, { onGameStart = onGameStart })
+	unhookCyclopedia()
 end
