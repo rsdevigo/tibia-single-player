@@ -1,10 +1,10 @@
-# Servidor Canary (v3.6.1, cliente 15.11) + bots, usando os binários do release do rsdevigo/canary-bots.
+# Servidor Canary (v3.6.1, cliente 15.25) + bots, usando os binários do release do rsdevigo/canary-bots.
 # Os binários são compilados no Ubuntu 24.04 (GCC 13) e só dependem de libc/libstdc++: o resto vem
 # estático do vcpkg. Ubuntu 22.04 não serve (GLIBCXX_3.4.32).
 FROM ubuntu:24.04
 
 ARG CANARY_BOTS_REPO=rsdevigo/canary-bots
-ARG CANARY_BOTS_VERSION=v2026.10.24.2
+ARG CANARY_BOTS_VERSION=v2026.11.01.1
 # O mapa principal não vem no tarball de runtime. É o mesmo arquivo desde a v3.4.1 (o release do
 # Canary copia o mapa do release anterior); mudam só house/monster/npc.xml, que vêm no tarball.
 ARG MAP_URL=https://github.com/opentibiabr/canary/releases/download/v3.6.1/otservbr.otbm

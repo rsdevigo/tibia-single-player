@@ -2,7 +2,7 @@
 
 Automação inspirada no RTC Helper do Rubinot (healing, ferramentas, auto target/shooter), por classe
 (Sorcerer, Druid, Paladin, Knight, Monk). Roda no **bot do OTClient Redemption** (`mods/game_bot`), como uma
-config própria, sem depender do vBot e sem mexer no servidor. Alvo: protocolo 1511.
+config própria, sem depender do vBot e sem mexer no servidor. Alvo: protocolo 1525.
 
 **Estado: esqueleto, NÃO TESTADO.** Ainda não foi carregado em um cliente real (não havia interpretador Lua nem
 cliente logado ao escrever). Só o núcleo existe; as abas estão como placeholders.

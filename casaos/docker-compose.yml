@@ -148,7 +148,7 @@ x-casaos:
   title:
     en_US: Tibia Single Player
   tagline:
-    en_US: Servidor Canary local (cliente 15.11) com jogadores-bot
+    en_US: Servidor Canary local (cliente 15.25) com jogadores-bot
   description:
     en_US: |
       Servidor OpenTibiaBR Canary v3.6.1 (fork rsdevigo/canary-bots) com jogadores-bot, MariaDB e MyAAC.

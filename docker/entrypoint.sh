@@ -4,8 +4,8 @@ cd /srv/canary
 
 : "${DB_HOST:=db}" "${DB_USER:=canary}" "${DB_PASS:=canary}" "${DB_NAME:=canary}"
 : "${SERVER_IP:=127.0.0.1}" "${BOT_PLAYERS_ONLINE:=100}"
-# Versão do cliente gravada no MyAAC; acompanha o protocolo do servidor (Canary v3.6.1 = 15.11).
-: "${MYAAC_CLIENT_VERSION:=1511}"
+# Versão do cliente gravada no MyAAC; acompanha o protocolo do servidor (Canary v3.6.1 = 15.25).
+: "${MYAAC_CLIENT_VERSION:=1525}"
 # Endereço que o MyAAC usa para consultar o status: o nome do serviço do servidor no compose.
 : "${MYAAC_STATUS_IP:=canary}"
 

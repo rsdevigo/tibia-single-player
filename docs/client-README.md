@@ -21,7 +21,7 @@ OTClient Redemption stores the matching `Tibia.dat` / `Tibia.spr` under its
 
 Where to obtain / how to extract them:
 - https://downloads.ots.me/?sort_by=mod&sort_as=asc&dir=data/tibia-clients/dat_and_spr/
-- https://github.com/dudantas/tibia-client/releases/tag/15.11.c9d1cf
+- https://github.com/dudantas/tibia-client/releases/tag/15.11.c9d1cf  (assets 15.11: para o 15.25 procure o build `15.25.794c2e` ou `15.25.d96c64`, os únicos que o servidor aceita)
 - https://github.com/opentibiabr/otclient/wiki/Tutorial-Protocol-12.x-assets
 
 > These are CipSoft assets — obtain them from a source you are entitled to; they
@@ -47,7 +47,7 @@ Services = {
 Servers_init = {
     ["http://127.0.0.1/login.php"] = {
         ["port"] = 80,
-        ["protocol"] = 1511,
+        ["protocol"] = 1525,
         ["httpLogin"] = true,
     }
 }

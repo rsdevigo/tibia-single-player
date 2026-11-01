@@ -1,10 +1,10 @@
 # AGENTS.md
 
 ## Objetivo
-Empacotar o servidor [rsdevigo/canary-bots](https://github.com/rsdevigo/canary-bots) (branch `canary-3.6.1`)
+Empacotar o servidor [rsdevigo/canary-bots](https://github.com/rsdevigo/canary-bots) (branch `canary-protocol-15.25`)
 em Docker para rodar no CasaOS, como servidor local de Tibia single player. Ele é um fork do
 [canary-bots-with-cast](https://github.com/1LineAtaTime/canary-bots-with-cast) (OpenTibiaBR Canary + jogadores-bot)
-com merge do Canary **v3.6.1 (cliente 15.11)** e o cast removido em favor do livestream do Canary.
+com merge do Canary **v3.6.1 (cliente 15.25)**, com o cast do fork de volta (a branch `canary-3.6.1` é a anterior, cliente 15.11, sem cast).
 
 Este repositório **não contém o código do servidor**: só o empacotamento (Dockerfile, compose, entrypoint).
 Mudanças no jogo/servidor vão para o `rsdevigo/canary-bots`; o release dele (tag `v*`, workflow `release.yml`)
@@ -30,7 +30,7 @@ publica `canary`, `libbot_engine.so` e `canary-bots-runtime-<tag>.tar.gz`, que o
 - `.env.example` — variáveis; copie para `.env`.
 
 ## Fatos do servidor (rsdevigo/canary-bots)
-- Banco: MySQL/MariaDB, charset `utf8mb3`, banco `canary`. `schema.sql` deixa o banco na versão 58 (Canary v3.6.1).
+- Banco: MySQL/MariaDB, charset `utf8mb3`, banco `canary`. `schema.sql` deixa o banco na versão 59 (Canary v3.6.1, protocolo 15.25).
 - Tabelas dos bots ficam em `database/bots/00_bot_schema.sql`, fora da numeração de migrações do Canary (a antiga
   `62.lua` do fork colidiria com as futuras do upstream). Bancos criados com o fork antigo estão em `db_version` 62:
   o entrypoint volta para 56 uma vez, e o Canary reaplica 57/58 (idempotentes).
@@ -42,13 +42,14 @@ publica `canary`, `libbot_engine.so` e `canary-bots-runtime-<tag>.tar.gz`, que o
   O PK aleatório (`checkRandomPK`) não tem chave no `config.lua`.
 - Livestream (do Canary): o jogador transmite com `!livestream on` (senha opcional com `!livestream password, ...`);
   o espectador loga com a conta `@livestream` e a senha da transmissão. Bots não podem ser assistidos.
-- Cliente: OTClient Redemption, **protocolo 1511**; ver `docs/client-README.md` (cópia do README do fork).
+- Cliente: OTClient Redemption, **protocolo 1525**; ver `docs/client-README.md` (cópia do README do fork).
 - Portas Canary: 7171 (login) e 7172 (game). O login do cliente passa pelo MyAAC (serviço `web`, `WEB_PORT`).
 
 ## Pontos em aberto / não verificados
-- Não testado com o cliente 15.11: login, jogo, `/party` com bots, livestream via `login.php`.
+- Não testado com o cliente 15.25: login, jogo, `/party` com bots, livestream via `login.php`.
 - Contas de jogador: criar pelo MyAAC (site).
-- Migração de um banco existente (fork antigo → v3.6.1) não foi testada com dados reais: fazer backup antes.
+- Release v2026.11.01.1 só foi compilado e empacotado: ninguém rodou servidor, bots, cast nem a migração `62.lua` (esta branch voltou a trazê-la; o entrypoint só volta 62→56 se ela não existir).
+- Migração de um banco existente (3.6.1/15.11 → 15.25, versão 58 → 59) não foi testada com dados reais: fazer backup antes.
 
 ## Convenções
 - Responder e comentar em português (pt-BR).
@@ -72,8 +73,8 @@ O Custom Install do CasaOS não faz `build:` nem lê `.env`, por isso há um com
 - `Dockerfile.web`: `php:8.2-apache` + MyAAC `MYAAC_VERSION` (1.9.5) + `login.php` e `plugins/` (worldmap) clonados do
   `rsdevigo/canary-bots` na tag `CANARY_BOTS_VERSION`. O `login.php` trata a conta `@livestream` (nenhuma versão do
   MyAAC faz isso: o livestream do Canary só responde no login antigo pela porta 7171).
-- O cliente OTClient faz login por HTTP (`login.php`, protocolo 1511, `httpLogin = true`), então o `web` é **necessário**, não opcional.
-- O entrypoint do `canary` grava a cada subida no MyAAC: `core.client` (`MYAAC_CLIENT_VERSION`, padrão 1511) e `core.status_ip` (`MYAAC_STATUS_IP`, padrão `canary`: o instalador grava 127.0.0.1, que dentro do container `web` é ele mesmo, e o painel mostrava o servidor offline).
+- O cliente OTClient faz login por HTTP (`login.php`, protocolo 1525, `httpLogin = true`), então o `web` é **necessário**, não opcional.
+- O entrypoint do `canary` grava a cada subida no MyAAC: `core.client` (`MYAAC_CLIENT_VERSION`, padrão 1525) e `core.status_ip` (`MYAAC_STATUS_IP`, padrão `canary`: o instalador grava 127.0.0.1, que dentro do container `web` é ele mesmo, e o painel mostrava o servidor offline).
 - Porta: `WEB_PORT` (padrão 8080 → 80 do container). No `init.lua` do cliente use `http://SERVER_IP:8080/login.php`, porta 8080 (ver `docs/init.lua.example`).
 - Primeiro acesso: abrir `http://SERVER_IP:8080/install`, informar servidor `/srv/canary`, banco `db` / `canary` / usuário e senha do `.env`.
 - Instalador do MyAAC só aceita IPs exatos de `install/ip.txt`; o `web-entrypoint.sh` o regera a cada subida com localhost + `MYAAC_INSTALL_IPS`. Descobrir o IP visto pelo Apache em `docker compose logs web` (1ª coluna do access log).
